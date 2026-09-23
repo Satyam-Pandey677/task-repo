@@ -27,11 +27,9 @@ export const updateMyProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
     console.log(userId);
-     // Auth Middleware se logged-in user ki ID
-    
+     
     const { name, department, designation, phone } = req.body;
 
-    // 1. Employee profile find karein
     let employee = await EMPLOYEE.findOne({ user:userId }).populate("user");
 
     console.log(employee)
@@ -43,7 +41,6 @@ export const updateMyProfile = async (req, res) => {
       });
     }
 
-    // 2. Sirf employee profile fields update karein (jo provide ki gayi hain)
     if (name) employee.name = name;
     if (department) employee.department = department;
     if (designation) employee.designation = designation;
@@ -51,7 +48,6 @@ export const updateMyProfile = async (req, res) => {
 
     const updatedEmployee = await employee.save();
 
-    // 3. Updated profile fetch with user details (read-only email & role)
     const populatedProfile = await EMPLOYEE.findById(updatedEmployee._id).populate(
       "user",
     );
@@ -81,6 +77,26 @@ const getDayBounds = () => {
 
 const getCurrentEmployee = (req) => EMPLOYEE.findOne({ user: req.user.userId });
 
+const formatTime = (date) => {
+  if (!date) return "--";
+  const value = new Date(date);
+  return value.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+const formatHours = (checkIn, checkOut) => {
+  if (!checkIn || !checkOut) return "--";
+
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const diffMs = end - start;
+  const totalMinutes = Math.max(0, Math.floor(diffMs / 60000));
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return `${hours}h ${minutes}m`;
+};
+
 export const getTodayAttendance = async (req, res) => {
   console.log("enter")
   try {
@@ -96,6 +112,46 @@ export const getTodayAttendance = async (req, res) => {
     });
 
     return res.status(200).json({ success: true, data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getAttendanceRecords = async (req, res) => {
+  try {
+    const { start, end } = getDayBounds();
+    const records = await ATTENDANCE.find({
+      date: { $gte: start, $lt: end },
+    }).populate("employeeId", "name department employeeID");
+
+    const attendanceList = records.map((record) => {
+      const employee = record.employeeId || {};
+      const checkIn = record.checkIn ? new Date(record.checkIn) : null;
+      const checkOut = record.checkOut ? new Date(record.checkOut) : null;
+      const isLate = checkIn && (checkIn.getHours() > 9 || (checkIn.getHours() === 9 && checkIn.getMinutes() > 30));
+
+      let status = "Present";
+      if (!checkIn && record.status === "absent") {
+        status = "On leave";
+      } else if (isLate) {
+        status = "Late";
+      }
+
+      return {
+        name: employee.name || "Unknown Employee",
+        department: employee.department || "Unassigned",
+        date: new Date(record.date).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }),
+        checkIn: formatTime(checkIn),
+        checkOut: formatTime(checkOut),
+        hours: formatHours(checkIn, checkOut),
+        status,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: attendanceList,
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
