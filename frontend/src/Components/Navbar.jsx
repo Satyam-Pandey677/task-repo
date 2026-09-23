@@ -1,8 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/userApi';
 
 const Navbar = ({ onMenuClick }) => {
-  const { user } = useAppData();
+  const { user, logout } = useAppData();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/sign-in', { replace: true });
+  };
 
   return (
     <nav className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-8">
@@ -31,8 +38,12 @@ const Navbar = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="hidden rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 sm:inline-flex">
-          Dashboard
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+        >
+          Logout
         </button>
 
         <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-2 py-1.5 pr-3">

@@ -41,13 +41,9 @@ export const getAllEmployees = async (req, res) => {
 export const updateMyProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
-    console.log(userId);
-     
-    const { name, department, designation, phone } = req.body;
+    const { name, phone } = req.body;
 
     let employee = await EMPLOYEE.findOne({ user:userId }).populate("user");
-
-    console.log(employee)
 
     if (!employee) {
       return res.status(404).json({
@@ -57,15 +53,13 @@ export const updateMyProfile = async (req, res) => {
     }
 
     if (name) employee.name = name;
-    if (department) employee.department = department;
-    if (designation) employee.designation = designation;
     if (phone) employee.phone = phone;
 
     const updatedEmployee = await employee.save();
 
-    const populatedProfile = await EMPLOYEE.findById(updatedEmployee._id).populate(
-      "user",
-    );
+    const populatedProfile = await EMPLOYEE.findById(updatedEmployee._id)
+      .populate("user", "email role")
+      .populate("department", "name");
 
     return res.status(200).json({
       message: "Profile updated successfully",
@@ -274,6 +268,37 @@ export const checkOut = async (req, res) => {
     await attendance.save();
 
     return res.status(200).json({ message: "Check-out marked successfully", data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateEmployeeByAdmin = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const { name, phone, department, designation, status, salary } = req.body;
+    const employee = await EMPLOYEE.findById(employeeId);
+
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    if (name !== undefined) employee.name = name;
+    if (phone !== undefined) employee.phone = phone;
+    if (department !== undefined) employee.department = department;
+    if (designation !== undefined) employee.designation = designation;
+    if (status !== undefined) employee.status = status;
+    if (salary !== undefined) employee.salary = Number(salary);
+
+    const updatedEmployee = await employee.save();
+    const populatedEmployee = await EMPLOYEE.findById(updatedEmployee._id)
+      .populate("user", "email role")
+      .populate("department", "name");
+
+    return res.status(200).json({
+      message: "Employee profile updated successfully",
+      data: populatedEmployee,
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

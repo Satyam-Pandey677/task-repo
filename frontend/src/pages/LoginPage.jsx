@@ -2,17 +2,17 @@ import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/userApi';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { isAuth, setUser, setIsAuth } = useAppData();
+  const { isAuth, fetchUser } = useAppData();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
-  if(isAuth) {
-    navigate("/")
+  if (isAuth) {
+    return <Navigate to="/" replace />;
   }
 
   const handleChange = (e) => {
@@ -33,8 +33,7 @@ const LoginPage = () => {
       const { data } = await axios.post('/api/user/login', form);
 
       Cookies.set('token', data.token, { expires: 1 });
-      setUser(data.user);
-      setIsAuth(true);
+      await fetchUser();
       toast.success(data.message || 'Login successful');
       navigate('/');
     } catch (error) {
@@ -47,7 +46,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="grid min-h-screen lg:grid-cols-2">
-        <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-950 p-10 lg:flex lg:flex-col lg:justify-between">
+        <div className="relative hidden overflow-hidden bg-linear-to-br from-emerald-900 via-emerald-800 to-slate-950 p-10 lg:flex lg:flex-col lg:justify-between">
           <div className="absolute inset-0 opacity-20">
             <div className="absolute -left-20 top-16 h-64 w-64 rounded-full bg-emerald-300 blur-3xl" />
             <div className="absolute bottom-10 right-0 h-72 w-72 rounded-full bg-teal-400 blur-3xl" />

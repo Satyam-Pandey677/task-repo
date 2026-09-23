@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
@@ -157,7 +157,8 @@ const HrDashboard = () => {
 };
 
 const EmployeeDashboard = () => {
-  const { user } = useAppData();
+  const { user, logout } = useAppData();
+  const navigate = useNavigate();
   const [todayAttendance, setTodayAttendance] = useState(null);
   const [attendancePercentage, setAttendancePercentage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -207,6 +208,11 @@ const EmployeeDashboard = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/sign-in', { replace: true });
   };
 
   const formatTime = (value) => value
@@ -277,6 +283,15 @@ const EmployeeDashboard = () => {
               {submitting && todayAttendance?.checkIn ? 'Checking out...' : 'Check out'}
             </button>
           </div>
+          {todayAttendance?.checkOut && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-3 w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+            >
+              Log out
+            </button>
+          )}
         </article>
 
         <article className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">

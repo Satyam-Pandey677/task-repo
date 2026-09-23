@@ -9,6 +9,7 @@ import LoadingContainer from '../../Components/LoadingContainer';
 
 const Profile = () => {
   const { user, loading, fetchUser } = useAppData();
+  const canEditEmployment = user?.user?.role === 'hr' || user?.user?.role === 'admin';
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -115,6 +116,7 @@ const Profile = () => {
           onSubmit={handleSubmit}
           onCancel={() => setIsEditing(false)}
           saving={saving}
+          canEditEmployment={canEditEmployment}
         />
       ) : (
         <>

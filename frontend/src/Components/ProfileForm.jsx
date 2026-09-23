@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProfileForm = ({ formData, onChange, onSubmit, onCancel, saving }) => {
+const ProfileForm = ({ formData, onChange, onSubmit, onCancel, saving, canEditEmployment = true }) => {
   return (
     <form onSubmit={onSubmit} className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
       <div className="flex items-center justify-between gap-4">
@@ -34,23 +34,25 @@ const ProfileForm = ({ formData, onChange, onSubmit, onCancel, saving }) => {
         </label>
 
         <label className="block text-sm font-medium text-slate-700">
-          <span className="mb-2 block">Department</span>
+          <span className="mb-2 block">Department {!canEditEmployment && <span className="text-xs font-normal text-slate-400">(HR/admin only)</span>}</span>
           <input
             type="text"
             name="department"
             value={formData.department || ''}
             onChange={onChange}
+            disabled={!canEditEmployment}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none transition focus:border-emerald-500 focus:bg-white"
           />
         </label>
 
         <label className="block text-sm font-medium text-slate-700">
-          <span className="mb-2 block">Designation</span>
+          <span className="mb-2 block">Designation {!canEditEmployment && <span className="text-xs font-normal text-slate-400">(HR/admin only)</span>}</span>
           <input
             type="text"
             name="designation"
             value={formData.designation || ''}
             onChange={onChange}
+            disabled={!canEditEmployment}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none transition focus:border-emerald-500 focus:bg-white"
           />
         </label>

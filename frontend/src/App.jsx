@@ -7,6 +7,7 @@ import Attendance from './pages/Attendance';
 import AdminLayout from './pages/Auth/AdminLayout';
 import AllEmployee from './pages/Admin/AllEmployee';
 import CreateEmployee from './pages/Admin/createEmployee';
+import CreateDepartment from './pages/Auth/CreateDepartment';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route element={<AdminLayout/>}>
           <Route path='/employees' element={<AllEmployee/>}/>
           <Route path='/employees/create' element={<CreateEmployee/>}/>
+          <Route path="/create-department" element={<CreateDepartment/>}/>
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/sign-in" replace />} />
