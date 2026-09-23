@@ -9,6 +9,9 @@ const employeeSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref:"USER"
     },
+    name:{
+        type: String,
+    },
     department: {
         type: String,
         required: true

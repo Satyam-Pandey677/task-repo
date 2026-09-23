@@ -1,6 +1,7 @@
     import express from "express"
     import userRouter from "./router/userRouter.js"
     import employeeRouter from "./router/employeeRouter.js"
+    import departmentRouter from "./router/departmentRouter.js"
     import { connectDB } from "./config/connectDB.js"
     import cors from "cors"
 
@@ -13,6 +14,7 @@
 
     app.use("/api/user", userRouter )
     app.use("/api/employee", employeeRouter )
+    app.use("/api/department", departmentRouter )
 
     app.get("/", (req, res) => {
   res.send("HRMS API Server is Running...");

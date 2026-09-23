@@ -3,24 +3,27 @@ import mongoose, { Schema } from "mongoose";
 const attendaceShcema = new mongoose.Schema({
     employeeId: {
         type: Schema.Types.ObjectId,
-        ref:"EMPLOYEE"
+        ref: "EMPLOYEE",
+        required: true,
     },
     date: {
-        type: new Date(),
-        default: Date.now()
+        type: Date,
+        default: Date.now,
     },
 
     status: {
-        type:String,
+        type: String,
         enum: ["present", "absent"],
-        default: "absent"
+        default: "absent",
     },
     checkIn: {
-        type:Date(),
+        type: Date,
     },
     checkOut: {
-        type: Date(),
-    }
-})
+        type: Date,
+    },
+}, {
+    timestamps: true,
+});
 
 export const ATTENDANCE = mongoose.model("ATTENDANCE", attendaceShcema)

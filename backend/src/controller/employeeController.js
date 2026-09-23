@@ -1,4 +1,5 @@
 import { EMPLOYEE } from "../model/EmployeeModel.js";
+import { ATTENDANCE } from "../model/AttendanceModel.js";
 
 
 
@@ -67,5 +68,93 @@ export const updateMyProfile = async (req, res) => {
       message: "Failed to update profile",
       error: error.message,
     });
+  }
+};
+
+const getDayBounds = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+  return { start, end };
+};
+
+const getCurrentEmployee = (req) => EMPLOYEE.findOne({ user: req.user.userId });
+
+export const getTodayAttendance = async (req, res) => {
+  console.log("enter")
+  try {
+    const employee = await getCurrentEmployee(req);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee profile not found" });
+    }
+
+    const { start, end } = getDayBounds();
+    const attendance = await ATTENDANCE.findOne({
+      employeeId: employee._id,
+      date: { $gte: start, $lt: end },
+    });
+
+    return res.status(200).json({ success: true, data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const checkIn = async (req, res) => {
+  try {
+    const employee = await getCurrentEmployee(req);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee profile not found" });
+    }
+
+    const { start, end } = getDayBounds();
+    const existingAttendance = await ATTENDANCE.findOne({
+      employeeId: employee._id,
+      date: { $gte: start, $lt: end },
+    });
+
+    if (existingAttendance) {
+      return res.status(409).json({ success: false, message: "Attendance already marked for today", data: existingAttendance });
+    }
+
+    const attendance = await ATTENDANCE.create({
+      employeeId: employee._id,
+      status: "present",
+      checkIn: new Date(),
+    });
+
+    return res.status(201).json({ success: true, message: "Check-in marked successfully", data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const checkOut = async (req, res) => {
+  try {
+    const employee = await getCurrentEmployee(req);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee profile not found" });
+    }
+
+    const { start, end } = getDayBounds();
+    const attendance = await ATTENDANCE.findOne({
+      employeeId: employee._id,
+      date: { $gte: start, $lt: end },
+    });
+
+    if (!attendance) {
+      return res.status(400).json({ success: false, message: "Please mark check-in first" });
+    }
+    if (attendance.checkOut) {
+      return res.status(409).json({ success: false, message: "Check-out already marked for today", data: attendance });
+    }
+
+    attendance.checkOut = new Date();
+    await attendance.save();
+
+    return res.status(200).json({ success: true, message: "Check-out marked successfully", data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -9,7 +9,7 @@ export const  isAuth = async (req, res, next) => {
       
       // req.user mein logged in user ki ID mil gayi
       req.user = decoded; 
-      // console.log(req.user)
+      // console.log(req.user.role)
       next();
     } catch (error) {
       return res.status(401).json({ success: false, message: "Not authorized, token failed" });
@@ -20,3 +20,18 @@ export const  isAuth = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Not authorized, no token" });
   }
 };
+
+
+export const authorizeAdmin = (req, res,next) => {
+
+  const allowedRoles = ["hr", "admin"]
+  
+    if(req.user && allowedRoles.includes(req.user.role)){
+        next()
+    }else{
+        res.status(403).json({
+            status: "fail",
+            message: "Not authorized as an admin"
+        });
+    }
+}
