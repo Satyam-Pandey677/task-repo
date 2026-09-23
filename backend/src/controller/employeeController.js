@@ -7,7 +7,9 @@ export const getMyProfile = async (req, res) => {
   try {
 
     const user = req.user.userId;
-    const employee = await EMPLOYEE.findOne({ user }).populate("user", "email role");
+    const employee = await EMPLOYEE.findOne({ user })
+      .populate("user", "email role")
+      .populate("department", "name");
 
     if (!employee) {
       throw new Error("Employee not found");
@@ -22,6 +24,19 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
+export const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await EMPLOYEE.find({})
+      .populate("user", "email role")
+      .populate("department", "name");
+
+    return res.status(200).json({
+      data: employees,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const updateMyProfile = async (req, res) => {
   try {
@@ -53,7 +68,6 @@ export const updateMyProfile = async (req, res) => {
     );
 
     return res.status(200).json({
-      success: true,
       message: "Profile updated successfully",
       data: populatedProfile,
     });
@@ -111,7 +125,44 @@ export const getTodayAttendance = async (req, res) => {
       date: { $gte: start, $lt: end },
     });
 
-    return res.status(200).json({ success: true, data: attendance });
+    return res.status(200).json({ data: attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getMyAttendanceStats = async (req, res) => {
+  try {
+    const employee = await getCurrentEmployee(req);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee profile not found" });
+    }
+
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const records = await ATTENDANCE.find({
+      employeeId: employee._id,
+      date: { $gte: monthStart, $lt: monthEnd },
+    });
+
+    let workingDays = 0;
+    for (let day = new Date(monthStart); day <= now; day.setDate(day.getDate() + 1)) {
+      if (day.getDay() !== 0 && day.getDay() !== 6) {
+        workingDays += 1;
+      }
+    }
+
+    const presentDays = records.filter((record) => record.status === "present" || record.checkIn).length;
+    const attendancePercentage = workingDays
+      ? Math.min(100, Math.round((presentDays / workingDays) * 100))
+      : 0;
+
+    return res.status(200).json({
+      attendancePercentage,
+      presentDays,
+      workingDays,
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -120,9 +171,23 @@ export const getTodayAttendance = async (req, res) => {
 export const getAttendanceRecords = async (req, res) => {
   try {
     const { start, end } = getDayBounds();
-    const records = await ATTENDANCE.find({
+    const attendanceQuery = {
       date: { $gte: start, $lt: end },
-    }).populate("employeeId", "name department employeeID");
+    };
+
+    if (req.user.role === "employee") {
+      const employee = await getCurrentEmployee(req);
+      if (!employee) {
+        return res.status(404).json({ success: false, message: "Employee profile not found" });
+      }
+      attendanceQuery.employeeId = employee._id;
+    }
+
+    const records = await ATTENDANCE.find(attendanceQuery).populate({
+      path: "employeeId",
+      select: "name department employeeID",
+      populate: { path: "department", select: "name" },
+    });
 
     const attendanceList = records.map((record) => {
       const employee = record.employeeId || {};
@@ -139,7 +204,7 @@ export const getAttendanceRecords = async (req, res) => {
 
       return {
         name: employee.name || "Unknown Employee",
-        department: employee.department || "Unassigned",
+        department: employee.department?.name || employee.department || "Unassigned",
         date: new Date(record.date).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }),
         checkIn: formatTime(checkIn),
         checkOut: formatTime(checkOut),
@@ -149,7 +214,6 @@ export const getAttendanceRecords = async (req, res) => {
     });
 
     return res.status(200).json({
-      success: true,
       data: attendanceList,
     });
   } catch (error) {
@@ -180,7 +244,7 @@ export const checkIn = async (req, res) => {
       checkIn: new Date(),
     });
 
-    return res.status(201).json({ success: true, message: "Check-in marked successfully", data: attendance });
+    return res.status(201).json({ message: "Check-in marked successfully", data: attendance });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -209,7 +273,7 @@ export const checkOut = async (req, res) => {
     attendance.checkOut = new Date();
     await attendance.save();
 
-    return res.status(200).json({ success: true, message: "Check-out marked successfully", data: attendance });
+    return res.status(200).json({ message: "Check-out marked successfully", data: attendance });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

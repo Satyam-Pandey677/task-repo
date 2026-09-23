@@ -15,6 +15,7 @@ export const createUser = async (req, res) => {
     designation,
     joiningDate,
     salary,
+    status,
   } = req.body;
 
   if (!name || !email || !password || !role) {
@@ -58,6 +59,7 @@ export const createUser = async (req, res) => {
     designation,
     joiningDate: joiningDate || Date.now(),
     salary,
+    status: status || "Active",
     user: newUser.id,
   });
 

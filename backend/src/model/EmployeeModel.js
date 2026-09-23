@@ -12,9 +12,13 @@ const employeeSchema = new mongoose.Schema({
     name:{
         type: String,
     },
-    department: {
+    phone: {
         type: String,
-        required: true
+        trim: true,
+    },
+    department: {
+        type: Schema.Types.ObjectId,
+        ref: "DEPARTMENT"
     },
     designation: {
         type: String,

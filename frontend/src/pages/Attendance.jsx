@@ -12,6 +12,7 @@ const statusStyles = {
 
 const Attendance = () => {
   const { user } = useAppData();
+  const isEmployee = user?.user?.role === 'employee';
   const [todayAttendance, setTodayAttendance] = useState(null);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,6 @@ const Attendance = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log(data)
       setTodayAttendance(data.data);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Could not load attendance');
@@ -84,8 +84,8 @@ const Attendance = () => {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 sm:text-sm">People operations</p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Attendance</h2>
-          <p className="mt-2 text-sm text-slate-500">Track check-ins, working hours, and leave status.</p>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{isEmployee ? 'My attendance' : 'Attendance'}</h2>
+          <p className="mt-2 text-sm text-slate-500">{isEmployee ? 'Review your check-ins, working hours, and attendance history.' : 'Track check-ins, working hours, and leave status.'}</p>
         </div>
         <span className="self-start rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 sm:self-auto">Live attendance</span>
       </div>
@@ -134,7 +134,7 @@ const Attendance = () => {
           </div>
           <div className="flex flex-wrap gap-2">
             <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600">Today ▾</button>
-            <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600">All departments ▾</button>
+            {!isEmployee && <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600">All departments ▾</button>}
           </div>
         </div>
 
@@ -179,7 +179,7 @@ const Attendance = () => {
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[720px] text-left">
+          <table className="w-full min-w-180 text-left">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-4 py-3 font-semibold sm:px-6">Employee</th><th className="px-4 py-3 font-semibold sm:px-6">Date</th><th className="px-4 py-3 font-semibold sm:px-6">Check in</th><th className="px-4 py-3 font-semibold sm:px-6">Check out</th><th className="px-4 py-3 font-semibold sm:px-6">Hours</th><th className="px-4 py-3 font-semibold sm:px-6">Status</th></tr></thead>
             <tbody className="divide-y divide-slate-100">
               {attendanceRecords.map((record) => (

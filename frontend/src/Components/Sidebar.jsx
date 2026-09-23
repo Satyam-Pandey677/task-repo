@@ -1,13 +1,20 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAppData } from '../context/userApi';
 
-const menuItems = [
+const sharedMenuItems = [
   { label: 'Dashboard', path: '/' },
   { label: 'Profile', path: '/profile' },
   { label: 'Attendance', path: '/attendance' },
 ];
 
 const Sidebar = ({ onClose }) => {
+  const { user } = useAppData();
+  const role = user?.user?.role;
+  const menuItems = role === 'admin' || role === 'hr'
+    ? [...sharedMenuItems, { label: 'All Employees', path: '/employees' }]
+    : sharedMenuItems;
+
   return (
     <aside className="h-screen w-72 border-r border-slate-200 bg-slate-50 px-4 py-6 shadow-xl md:w-64 md:shadow-none">
       <div className="mb-6 flex items-center justify-between md:hidden">

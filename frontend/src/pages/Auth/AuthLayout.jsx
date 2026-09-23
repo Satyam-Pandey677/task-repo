@@ -4,7 +4,8 @@ import { useAppData } from '../../context/userApi';
 import Layout from '../Layout/Layout';
 
 const AuthLayout = () => {
-  const { isAuth, loading } = useAppData();
+  const { user,isAuth, loading } = useAppData();
+  console.log(user)
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
