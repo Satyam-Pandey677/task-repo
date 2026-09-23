@@ -3,8 +3,11 @@ import { authorizeAdmin, isAuth } from "../middelware/isAuth.js";
 import {
 	checkIn,
 	checkOut,
+	deleteEmployeeByAdmin,
 	getAllEmployees,
+	getEmployeeDetails,
 	getAttendanceRecords,
+	getAttendanceHistory,
 	getMyAttendanceStats,
 	getMyProfile,
 	getTodayAttendance,
@@ -16,9 +19,12 @@ const router = Router()
 
 router.route("/me").get(isAuth, getMyProfile)
 router.route("/all").get(isAuth, getAllEmployees)
+router.route("/:employeeId/details").get(isAuth, authorizeAdmin, getEmployeeDetails)
+router.route("/:employeeId").delete(isAuth, authorizeAdmin, deleteEmployeeByAdmin)
 router.route("/update-profile").put(isAuth, updateMyProfile)
 router.route("/:employeeId/profile").put(isAuth, authorizeAdmin, updateEmployeeByAdmin)
 router.route("/attendance").get(isAuth, getAttendanceRecords)
+router.route("/attendance/history").get(isAuth, getAttendanceHistory)
 router.route("/attendance/today").get(isAuth, getTodayAttendance)
 router.route("/attendance/stats").get(isAuth, getMyAttendanceStats)
 router.route("/attendance/check-in").post(isAuth, checkIn)

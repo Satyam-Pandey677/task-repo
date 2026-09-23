@@ -1,5 +1,6 @@
 import { EMPLOYEE } from "../model/EmployeeModel.js";
 import { ATTENDANCE } from "../model/AttendanceModel.js";
+import { USER } from "../model/UserModel.js";
 
 
 
@@ -32,6 +33,31 @@ export const getAllEmployees = async (req, res) => {
 
     return res.status(200).json({
       data: employees,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteEmployeeByAdmin = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const employee = await EMPLOYEE.findById(employeeId);
+
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    await ATTENDANCE.deleteMany({ employeeId: employee._id });
+    await EMPLOYEE.findByIdAndDelete(employee._id);
+
+    if (employee.user) {
+      await USER.findByIdAndDelete(employee.user);
+    }
+
+    return res.status(200).json({
+      message: "Employee deleted successfully",
+      employeeId,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -215,6 +241,77 @@ export const getAttendanceRecords = async (req, res) => {
   }
 };
 
+export const getAttendanceHistory = async (req, res) => {
+  try {
+    const { month, year } = req.query;
+    const currentDate = new Date();
+    const selectedMonth = Number.isInteger(Number(month)) ? Number(month) : currentDate.getMonth() + 1;
+    const selectedYear = Number.isInteger(Number(year)) ? Number(year) : currentDate.getFullYear();
+    const start = new Date(selectedYear, selectedMonth - 1, 1);
+    const end = new Date(selectedYear, selectedMonth, 1);
+    const attendanceQuery = { date: { $gte: start, $lt: end } };
+
+    if (req.user.role === "employee") {
+      const employee = await getCurrentEmployee(req);
+      if (!employee) {
+        return res.status(404).json({ success: false, message: "Employee profile not found" });
+      }
+      attendanceQuery.employeeId = employee._id;
+    }
+
+    const records = await ATTENDANCE.find(attendanceQuery)
+      .sort({ date: 1 })
+      .populate({
+        path: "employeeId",
+        select: "name employeeID",
+      });
+
+    if (req.user.role === "employee") {
+      const employee = await getCurrentEmployee(req);
+      const recordsByDate = new Set(records.map((record) => {
+        const date = new Date(record.date);
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      }));
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      today.setDate(today.getDate() - 1);
+      const lastDay = new Date(end);
+      lastDay.setDate(lastDay.getDate() - 1);
+      const effectiveLastDay = lastDay < today ? lastDay : today;
+
+      for (let day = new Date(start); day <= effectiveLastDay; day.setDate(day.getDate() + 1)) {
+        const dateKey = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`;
+        if (day.getDay() !== 0 && day.getDay() !== 6 && !recordsByDate.has(dateKey)) {
+          records.push({
+            _id: `absent-${dateKey}`,
+            date: new Date(day),
+            status: "absent",
+            checkIn: null,
+            checkOut: null,
+            employeeId: employee,
+          });
+        }
+      }
+      records.sort((first, second) => new Date(first.date) - new Date(second.date));
+    }
+
+    return res.status(200).json({
+      month: selectedMonth,
+      year: selectedYear,
+      data: records.map((record) => ({
+        id: record._id,
+        date: record.date,
+        status: record.status,
+        checkIn: record.checkIn,
+        checkOut: record.checkOut,
+        employee: record.employeeId,
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const checkIn = async (req, res) => {
   try {
     const employee = await getCurrentEmployee(req);
@@ -298,6 +395,32 @@ export const updateEmployeeByAdmin = async (req, res) => {
     return res.status(200).json({
       message: "Employee profile updated successfully",
       data: populatedEmployee,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getEmployeeDetails = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const employee = await EMPLOYEE.findById(employeeId)
+      .populate("user", "email role")
+      .populate("department", "name");
+
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    const attendance = await ATTENDANCE.find({ employeeId: employee._id })
+      .sort({ date: -1 })
+      .select("date status checkIn checkOut");
+
+    return res.status(200).json({
+      data: {
+        employee,
+        attendance,
+      },
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

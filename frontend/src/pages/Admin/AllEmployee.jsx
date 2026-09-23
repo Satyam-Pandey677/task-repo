@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import LoadingContainer from "../../Components/LoadingContainer";
+import { Trash } from "lucide-react";
 
 const statusStyles = {
   Active: "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -29,6 +31,7 @@ const AllEmployee = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -49,6 +52,27 @@ const AllEmployee = () => {
 
     fetchEmployees();
   }, []);
+
+  const handleDelete = async (employee) => {
+    const employeeName = employee.name || 'this employee';
+    if (!window.confirm(`Delete ${employeeName}? This will also remove their attendance records.`)) {
+      return;
+    }
+
+    try {
+      setDeletingId(employee._id);
+      const token = Cookies.get('token');
+      const { data } = await axios.delete(`/api/employee/${employee._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEmployees((current) => current.filter((item) => item._id !== employee._id));
+      toast.success(data.message || 'Employee deleted successfully');
+    } catch (requestError) {
+      toast.error(requestError.response?.data?.message || 'Failed to delete employee');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const departments = useMemo(
     () =>
@@ -231,6 +255,7 @@ const AllEmployee = () => {
                     <th className="px-4 py-4 font-bold">Role</th>
                     <th className="px-4 py-4 font-bold">Contact</th>
                     <th className="px-6 py-4 font-bold">Status</th>
+                    <th className="px-6 py-4 text-right font-bold">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -247,9 +272,9 @@ const AllEmployee = () => {
                               {getInitials(employee.name)}
                             </span>
                             <div>
-                              <p className="font-semibold text-slate-800">
+                              <Link to={`/employees/${employee._id}`} className="font-semibold text-slate-800 hover:text-emerald-700">
                                 {employee.name || "Unnamed employee"}
-                              </p>
+                              </Link>
                               <p className="mt-0.5 text-xs text-slate-400">
                                 {employee.employeeID || "No ID"}
                               </p>
@@ -277,6 +302,16 @@ const AllEmployee = () => {
                             {status}
                           </span>
                         </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(employee)}
+                            disabled={deletingId === employee._id}
+                            className="text-sm font-semibold text-red-600 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {deletingId === employee._id ? "Deleting..." : <Trash/>}
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -297,9 +332,9 @@ const AllEmployee = () => {
                           {getInitials(employee.name)}
                         </span>
                         <div className="min-w-0">
-                          <p className="truncate font-semibold text-slate-800">
+                          <Link to={`/employees/${employee._id}`} className="truncate font-semibold text-slate-800 hover:text-emerald-700">
                             {employee.name || "Unnamed employee"}
-                          </p>
+                          </Link>
                           <p className="mt-0.5 text-xs text-slate-400">
                             {employee.employeeID || "No ID"}
                           </p>
@@ -333,6 +368,14 @@ const AllEmployee = () => {
                         </p>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(employee)}
+                      disabled={deletingId === employee._id}
+                      className="mt-4 w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingId === employee._id ? "Deleting..." : "Delete employee"}
+                    </button>
                   </article>
                 );
               })}

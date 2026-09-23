@@ -6,14 +6,14 @@ const sharedMenuItems = [
   { label: 'Dashboard', path: '/' },
   { label: 'Profile', path: '/profile' },
   { label: 'Attendance', path: '/attendance' },
-  { label: 'Departments', path: '/create-department' },
+  { label: 'Calendar', path: '/attendance-calendar' },
 ];
 
 const Sidebar = ({ onClose }) => {
   const { user } = useAppData();
   const role = user?.user?.role;
   const menuItems = role === 'admin' || role === 'hr'
-    ? [...sharedMenuItems, { label: 'All Employees', path: '/employees' }]
+    ? [...sharedMenuItems, { label: 'All Employees', path: '/employees' }, {label: "Department", path:"/create-department"}]
     : sharedMenuItems;
 
   return (
