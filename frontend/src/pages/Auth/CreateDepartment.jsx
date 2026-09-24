@@ -50,7 +50,7 @@ const CreateDepartment = () => {
       });
 
       toast.success(data.message || 'Department created successfully');
-      setDepartments((current) => [data.department, ...current]);
+      await fetchDepartments();
       setName('');
       setShowForm(false);
     } catch (error) {

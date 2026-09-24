@@ -40,7 +40,7 @@ const Leave = () => {
     try {
       setSaving(true);
       const { data } = await axios.post('/api/employee/leave', form, { headers: headers() });
-      setLeaveRequests((current) => [data.data, ...current]);
+      await fetchLeaveRequests();
       setForm({ startDate: '', endDate: '', reason: '' });
       toast.success(data.message || 'Leave request submitted');
     } catch (error) {
@@ -53,7 +53,7 @@ const Leave = () => {
   const updateStatus = async (leaveId, status) => {
     try {
       const { data } = await axios.patch(`/api/employee/leave/${leaveId}/status`, { status }, { headers: headers() });
-      setLeaveRequests((current) => current.map((leave) => leave._id === leaveId ? data.data : leave));
+      await fetchLeaveRequests();
       toast.success(data.message || `Leave ${status}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update leave request');

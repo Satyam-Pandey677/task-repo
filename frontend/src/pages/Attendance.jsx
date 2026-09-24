@@ -63,6 +63,7 @@ const Attendance = () => {
       });
       setTodayAttendance(data.data);
       toast.success(data.message);
+      await loadAttendanceRecords();
     } catch (error) {
       setTodayAttendance(error.response?.data?.data || todayAttendance);
       toast.error(error.response?.data?.message || 'Attendance action failed');
@@ -78,6 +79,13 @@ const Attendance = () => {
   const totalPresent = attendanceRecords.filter((record) => record.status === 'Present').length;
   const totalLate = attendanceRecords.filter((record) => record.status === 'Late').length;
   const totalOnLeave = attendanceRecords.filter((record) => record.status === 'On leave').length;
+
+  const currentDateString = new Intl.DateTimeFormat([], {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-3 py-2 sm:px-4 lg:px-6">
@@ -130,7 +138,7 @@ const Attendance = () => {
         <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <h3 className="text-lg font-bold text-slate-900">Daily attendance log</h3>
-            <p className="mt-1 text-sm text-slate-500">Wednesday, 23 September 2026</p>
+            <p className="mt-1 text-sm text-slate-500">{currentDateString}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600">Today ▾</button>

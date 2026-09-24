@@ -60,11 +60,18 @@ const HrDashboard = () => {
     color: person.status === 'Present' ? 'bg-emerald-500' : person.status === 'Late' ? 'bg-amber-500' : 'bg-slate-400',
   }));
 
+  const currentDateString = new Intl.DateTimeFormat([], {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <section className="relative overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-lg sm:p-8">
         <div className="relative z-10 max-w-2xl">
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-emerald-300">Wednesday, 23 September 2026</p>
+          <p className="text-sm font-medium uppercase tracking-[0.22em] text-emerald-300">{currentDateString}</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Good morning, {user?.name || 'Employee'}.</h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">Here is what is happening across your team today. Keep your people, attendance, and approvals moving.</p>
         </div>
@@ -189,7 +196,6 @@ const EmployeeDashboard = () => {
     fetchTodayAttendance();
   }, []);
 
-
   const markAttendance = async (action) => {
     try {
       setSubmitting(true);
@@ -204,6 +210,11 @@ const EmployeeDashboard = () => {
 
       setTodayAttendance(data?.data || todayAttendance);
       toast.success(data?.message || `${action} successful`);
+
+      const statsResponse = await axios.get('/api/employee/attendance/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAttendancePercentage(statsResponse.data?.attendancePercentage || 0);
     } catch (error) {
       setTodayAttendance(error.response?.data?.data || todayAttendance);
       toast.error(error.response?.data?.message || 'Attendance action failed');
