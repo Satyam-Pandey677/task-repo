@@ -57,17 +57,17 @@ const HrDashboard = () => {
         subtitle="Here is what is happening across your team today. Keep your people, attendance, and approvals moving."
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <article key={s.label} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <article key={s.label} className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-slate-200">
             <div className="flex items-start justify-between">
-              <span className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold ${s.tone}`}>{s.icon}</span>
-              <span className="text-xs font-medium text-slate-400">Today</span>
+              <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-base font-bold sm:h-10 sm:w-10 sm:text-lg ${s.tone}`}>{s.icon}</span>
+              <span className="text-[11px] font-medium text-slate-400 sm:text-xs">Today</span>
             </div>
-            <p className="mt-5 text-sm font-medium text-slate-500">{s.label}</p>
-            <div className="mt-1 flex items-end justify-between gap-2">
-              <p className="text-3xl font-bold text-slate-900">{s.value}</p>
-              <p className="text-right text-xs font-medium text-slate-500">{s.detail}</p>
+            <p className="mt-3 text-xs font-medium text-slate-500 sm:mt-5 sm:text-sm">{s.label}</p>
+            <div className="mt-1 flex items-end justify-between gap-1 sm:gap-2">
+              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">{s.value}</p>
+              <p className="text-right text-[11px] font-medium text-slate-500 sm:text-xs">{s.detail}</p>
             </div>
           </article>
         ))}

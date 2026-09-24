@@ -100,7 +100,7 @@ export const updateMyProfile = async (req, res) => {
 export const updateEmployeeByAdmin = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    const { name, phone, department, designation, status, salary } = req.body;
+    const { name, phone, department, designation, status, salary, joiningDate, email, role } = req.body;
     const employee = await EMPLOYEE.findById(employeeId);
 
     if (!employee) {
@@ -111,10 +111,32 @@ export const updateEmployeeByAdmin = async (req, res) => {
 
     if (name !== undefined) employee.name = name;
     if (phone !== undefined) employee.phone = phone;
-    if (department !== undefined) employee.department = department;
+    if (department !== undefined) employee.department = department || null;
     if (designation !== undefined) employee.designation = designation;
     if (status !== undefined) employee.status = status;
-    if (salary !== undefined) employee.salary = Number(salary);
+    if (salary !== undefined && salary !== "") employee.salary = Number(salary);
+    if (joiningDate !== undefined) employee.joiningDate = joiningDate;
+
+    if (employee.user) {
+      const userDoc = await USER.findById(employee.user);
+      if (userDoc) {
+        if (email && email.toLowerCase() !== userDoc.email.toLowerCase()) {
+          const emailExists = await USER.findOne({
+            email: email.toLowerCase(),
+            _id: { $ne: userDoc._id },
+          });
+          if (emailExists) {
+            return res.status(400).json({ message: "Email is already in use by another user" });
+          }
+          userDoc.email = email.toLowerCase();
+        }
+        if (name !== undefined) userDoc.name = name;
+        if (role !== undefined && ["admin", "hr", "employee"].includes(role)) {
+          userDoc.role = role;
+        }
+        await userDoc.save();
+      }
+    }
 
     const updatedEmployee = await employee.save();
     const populatedEmployee = await EMPLOYEE.findById(updatedEmployee._id)

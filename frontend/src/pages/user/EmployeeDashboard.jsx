@@ -78,17 +78,17 @@ const EmployeeDashboard = () => {
         subtitle="Your personal workday overview, attendance status, and profile details."
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
           ['Check in', formatTime(todayAtt?.checkIn), 'Today', 'bg-sky-50 text-sky-700'],
           ['Check out', formatTime(todayAtt?.checkOut), 'Today', 'bg-amber-50 text-amber-700'],
           ['Attendance', `${attPct}%`, 'This month', 'bg-violet-50 text-violet-700'],
           ['Department', deptName || 'Not assigned', 'Your team', 'bg-slate-100 text-slate-700'],
         ].map(([label, value, detail, tone]) => (
-          <article key={label} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-            <span className={`inline-flex rounded-xl px-3 py-2 text-xs font-bold ${tone}`}>{label}</span>
-            <p className="mt-5 truncate text-2xl font-bold text-slate-900">{value}</p>
-            <p className="mt-1 text-xs text-slate-400">{detail}</p>
+          <article key={label} className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-slate-200">
+            <span className={`inline-flex rounded-xl px-2.5 py-1.5 text-[11px] font-bold sm:px-3 sm:py-2 sm:text-xs ${tone}`}>{label}</span>
+            <p className="mt-3 truncate text-xl font-bold text-slate-900 sm:mt-5 sm:text-2xl">{value}</p>
+            <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">{detail}</p>
           </article>
         ))}
       </section>

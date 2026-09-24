@@ -3,6 +3,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link, useParams } from 'react-router-dom';
 import LoadingContainer from '../../Components/LoadingContainer';
+import { Pencil } from 'lucide-react';
+import EditEmployeeModal from '../../Components/EditEmployeeModal';
 
 const formatDate = (value) => value
   ? new Date(value).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })
@@ -26,6 +28,7 @@ const EmployeeDetails = () => {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -74,15 +77,25 @@ const EmployeeDetails = () => {
               <p className="mt-1 text-sm text-slate-500">{employee.employeeID || 'No employee ID'} · {employee.designation || 'No designation'}</p>
             </div>
           </div>
-          <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">{employee.status || 'Active'}</span>
+          <div className="flex items-center gap-3">
+            <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">{employee.status || 'Active'}</span>
+            <button
+              type="button"
+              onClick={() => setIsEditOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-800"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit Profile
+            </button>
+          </div>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Department</p><p className="mt-2 font-bold text-slate-900">{departmentName || 'Unassigned'}</p></div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Email</p><p className="mt-2 truncate font-bold text-slate-900">{employee.user?.email || 'No email'}</p></div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Phone</p><p className="mt-2 font-bold text-slate-900">{employee.phone || 'No phone'}</p></div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Attendance</p><p className="mt-2 font-bold text-slate-900">{attendancePercentage}%</p></div>
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4"><p className="text-xs text-slate-500 sm:text-sm">Department</p><p className="mt-1.5 truncate font-bold text-slate-900 sm:mt-2">{departmentName || 'Unassigned'}</p></div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4"><p className="text-xs text-slate-500 sm:text-sm">Email</p><p className="mt-1.5 truncate font-bold text-slate-900 sm:mt-2">{employee.user?.email || 'No email'}</p></div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4"><p className="text-xs text-slate-500 sm:text-sm">Phone</p><p className="mt-1.5 truncate font-bold text-slate-900 sm:mt-2">{employee.phone || 'No phone'}</p></div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4"><p className="text-xs text-slate-500 sm:text-sm">Attendance</p><p className="mt-1.5 truncate font-bold text-slate-900 sm:mt-2">{attendancePercentage}%</p></div>
       </section>
 
       <section className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
@@ -122,6 +135,13 @@ const EmployeeDetails = () => {
           </div>
         )}
       </section>
+
+      <EditEmployeeModal
+        employee={employee}
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onSuccess={(updated) => setEmployee(updated)}
+      />
     </div>
   );
 };

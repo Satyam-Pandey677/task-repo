@@ -173,6 +173,40 @@ The HRMS application is designed to provide an optimized experience across all s
 - Touch-friendly action buttons and responsive cards for attendance check-in/out and profile view.
 - Overflow scrolling support for data tables.
 
+## Screen Shots
+
+<div align="center">
+
+<h3>Dashboard</h3>
+
+<img src="./screenshots/desktop-dashboard.png" width="750">
+
+<br><br>
+
+<img src="./screenshots/mobile-dashboard.png" width="280">
+
+<br><br>
+
+<h3>Employee Management</h3>
+
+<img src="./screenshots/employees-desktop.png" width="750">
+
+<br><br>
+
+<img src="./screenshots/employees-mobile.png" width="280">
+
+<br><br>
+
+<h3>Attendance Management</h3>
+
+<img src="./screenshots/attendance-desktop.png" width="750">
+
+<br><br>
+
+<img src="./screenshots/attendance-mobile.png" width="280">
+
+</div>
+
 ---
 
 ## 📝 Submission Deliverables Checklist

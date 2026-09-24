@@ -34,7 +34,7 @@ const employeeSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum: ["Active", "Resigned"]
+        enum: ["Active", "On Leave", "Resigned"]
     },
 },{
     timestamps:true

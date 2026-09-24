@@ -98,10 +98,10 @@ const Attendance = () => {
         <span className="self-start rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 sm:self-auto">Live attendance</span>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5"><p className="text-sm text-slate-500">Present</p><p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{totalPresent}</p><p className="mt-1 text-xs font-medium text-emerald-600">Today’s live count</p></div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5"><p className="text-sm text-slate-500">Late arrivals</p><p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{totalLate}</p><p className="mt-1 text-xs font-medium text-amber-600">Arrived after 9:30 AM</p></div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5 sm:col-span-2 xl:col-span-1"><p className="text-sm text-slate-500">On leave</p><p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{totalOnLeave}</p><p className="mt-1 text-xs font-medium text-slate-500">Marked unavailable</p></div>
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200 sm:p-5"><p className="text-xs text-slate-500 sm:text-sm">Present</p><p className="mt-1.5 text-xl font-bold text-slate-900 sm:mt-2 sm:text-3xl">{totalPresent}</p><p className="mt-1 text-[11px] font-medium text-emerald-600 sm:text-xs">Today’s live count</p></div>
+        <div className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200 sm:p-5"><p className="text-xs text-slate-500 sm:text-sm">Late arrivals</p><p className="mt-1.5 text-xl font-bold text-slate-900 sm:mt-2 sm:text-3xl">{totalLate}</p><p className="mt-1 text-[11px] font-medium text-amber-600 sm:text-xs">Arrived after 9:30 AM</p></div>
+        <div className="col-span-2 rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200 sm:p-5 lg:col-span-1"><p className="text-xs text-slate-500 sm:text-sm">On leave</p><p className="mt-1.5 text-xl font-bold text-slate-900 sm:mt-2 sm:text-3xl">{totalOnLeave}</p><p className="mt-1 text-[11px] font-medium text-slate-500 sm:text-xs">Marked unavailable</p></div>
       </section>
 
       <section className="flex flex-col gap-4 rounded-2xl bg-emerald-700 p-4 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
