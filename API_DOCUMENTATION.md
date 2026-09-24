@@ -94,11 +94,12 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 
 ### 1.3 Update Password
 - **Endpoint:** `POST /api/user/update-password`
-- **Access:** Authenticated User
-- **Description:** Update current user's password.
+- **Access:** Public / Authenticated User
+- **Description:** Update user's password using email (or session JWT) and current password.
 - **Request Body:**
   ```json
   {
+    "email": "user@company.com",
     "oldPassword": "password123",
     "newPassword": "newSecurePassword@123"
   }

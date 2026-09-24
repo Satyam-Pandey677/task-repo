@@ -2,11 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import AuthLayout from './pages/Auth/AuthLayout';
 import LoginPage from './pages/LoginPage';
+import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import Profile from './pages/user/Profile';
 import Attendance from './pages/Attendance';
 import AdminLayout from './pages/Auth/AdminLayout';
 import AllEmployee from './pages/Admin/AllEmployee';
-import CreateEmployee from './pages/Admin/createEmployee';
+import CreateEmployee from './pages/Admin/CreateEmployee';
 import CreateDepartment from './pages/Auth/CreateDepartment';
 import EmployeeDetails from './pages/Admin/EmployeeDetails';
 import AttendanceCalendar from './pages/AttendanceCalendar';
@@ -17,6 +18,7 @@ function App() {
   return (
     <Routes>
       <Route path="/sign-in" element={<LoginPage />} />
+      <Route path="/update-password" element={<UpdatePasswordPage />} />
       <Route element={<AuthLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />

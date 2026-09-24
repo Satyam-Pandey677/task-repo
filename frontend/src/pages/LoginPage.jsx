@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/userApi';
 
 const LoginPage = () => {
@@ -119,9 +119,9 @@ const LoginPage = () => {
                   <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
                   Remember me
                 </label>
-                <button type="button" className="font-medium text-emerald-600 hover:text-emerald-700">
-                  Forgot password?
-                </button>
+                <Link to="/update-password" className="font-medium text-emerald-600 hover:text-emerald-700">
+                  Update password?
+                </Link>
               </div>
 
               <button

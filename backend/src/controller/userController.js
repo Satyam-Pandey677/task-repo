@@ -69,8 +69,8 @@ export const createUser = async (req, res) => {
   });
 };
 
-const generateToken = ( userId) => {
-  const token = jwt.sign( userId , process.env.JWT_SECRET, {
+const generateToken = (userId) => {
+  const token = jwt.sign(userId, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 
@@ -92,13 +92,13 @@ export const loginUser = async (req, res) => {
     );
 
     if (isPasswordMatched) {
-    
-        const employeeProfile = await EMPLOYEE.findOne({user:existUser._id})
+
+      const employeeProfile = await EMPLOYEE.findOne({ user: existUser._id })
 
       const token = generateToken({
-        userId:existUser._id,
-        employeeID:employeeProfile ? employeeProfile._id: null,
-        role:existUser.role
+        userId: existUser._id,
+        employeeID: employeeProfile ? employeeProfile._id : null,
+        role: existUser.role
       });
 
       return res.status(200).json({
@@ -110,36 +110,43 @@ export const loginUser = async (req, res) => {
     throw new Error("Please enter correct password")
   }
 
-  throw new Error ("Something went wrong")
+  throw new Error("Something went wrong")
 };
 
-export const  updatePassword = async(req, res) => {
-    const {oldPassword, newPassword} = req.body;
-    if(!oldPassword || !newPassword){
-        throw new Error("Enter all reqired fields");
+export const updatePassword = async (req, res) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Enter all required fields" });
     }
 
-    const user = await USER.findById(req.user.userId);
+    let user;
+    if (email) {
+      user = await USER.findOne({ email });
+    }
 
-    if(!user){
-        res.status(404)
-        throw new Error( "user Not Found")
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     const isPasswordMatched = await bcrypt.compare(
       oldPassword,
-      user.password,
+      user.password
     );
 
-    if(!isPasswordMatched){
-        throw new Error("Old Password is wrong")
+    if (!isPasswordMatched) {
+      return res.status(401).json({ message: "Old password is wrong" });
     }
-const salt = await bcrypt.genSalt(10);
+
+    const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
     return res.status(200).json({
-        message:"Password updated successfully"
-    })
-}
+      message: "Password updated successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
