@@ -12,12 +12,12 @@ export const  isAuth = async (req, res, next) => {
       // console.log(req.user.role)
       next();
     } catch (error) {
-      return res.status(401).json({ success: false, message: "Not authorized, token failed" });
+      return res.status(401).json({ message: "Not authorized, token failed" });
     }
   }
 
   if (!token) {
-    return res.status(401).json({ success: false, message: "Not authorized, no token" });
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 };
 

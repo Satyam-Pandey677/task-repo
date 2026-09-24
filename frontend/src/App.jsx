@@ -10,6 +10,7 @@ import CreateEmployee from './pages/Admin/createEmployee';
 import CreateDepartment from './pages/Auth/CreateDepartment';
 import EmployeeDetails from './pages/Admin/EmployeeDetails';
 import AttendanceCalendar from './pages/AttendanceCalendar';
+import Leave from './pages/Leave';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/attendance-calendar" element={<AttendanceCalendar />} />
+        <Route path="/leave" element={<Leave />} />
         <Route element={<AdminLayout/>}>
           <Route path='/employees' element={<AllEmployee/>}/>
           <Route path='/employees/create' element={<CreateEmployee/>}/>

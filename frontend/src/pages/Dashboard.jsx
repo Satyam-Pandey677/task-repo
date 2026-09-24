@@ -29,6 +29,7 @@ const HrDashboard = () => {
     fetchAttendance();
   }, []);
 
+
   const totalEmployees = attendanceRecords.length;
   const totalPresent = attendanceRecords.filter((record) => record.status === 'Present').length;
   const totalLate = attendanceRecords.filter((record) => record.status === 'Late').length;
@@ -188,6 +189,7 @@ const EmployeeDashboard = () => {
     fetchTodayAttendance();
   }, []);
 
+
   const markAttendance = async (action) => {
     try {
       setSubmitting(true);
@@ -304,6 +306,7 @@ const EmployeeDashboard = () => {
           </div>
         </article>
       </section>
+
     </div>
   );
 };

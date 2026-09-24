@@ -56,6 +56,7 @@ const AttendanceCalendar = () => {
     new Date(today.getFullYear(), today.getMonth(), 1),
   );
   const [records, setRecords] = useState([]);
+  const [leaveRecords, setLeaveRecords] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dateKey(today));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -75,12 +76,14 @@ const AttendanceCalendar = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRecords(data?.data || []);
+        setLeaveRecords(data?.leaves || []);
       } catch (requestError) {
         setError(
           requestError.response?.data?.message ||
             "Unable to load attendance calendar",
         );
         setRecords([]);
+        setLeaveRecords([]);
       } finally {
         setLoading(false);
       }
@@ -123,6 +126,12 @@ const AttendanceCalendar = () => {
   }, [viewDate]);
 
   const selectedRecords = recordsByDate[selectedDate] || [];
+  const selectedLeaves = leaveRecords.filter((leave) => {
+    const selected = new Date(`${selectedDate}T00:00:00`);
+    const start = new Date(leave.startDate);
+    const end = new Date(leave.endDate);
+    return selected >= new Date(start.getFullYear(), start.getMonth(), start.getDate()) && selected <= new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  });
   const presentCount = records.filter(
     (record) => statusLabel(record) === "Present",
   ).length;
@@ -220,7 +229,14 @@ const AttendanceCalendar = () => {
                 const key = dateKey(day);
                 const dayRecords = recordsByDate[key] || [];
                 const statuses = dayRecords.map(statusLabel);
-                const dayStatus = statuses.includes("Present")
+                const isLeaveDay = leaveRecords.some((leave) => {
+                  const leaveStart = dateKey(leave.startDate);
+                  const leaveEnd = dateKey(leave.endDate);
+                  return key >= leaveStart && key <= leaveEnd;
+                });
+                const dayStatus = isLeaveDay
+                  ? "Leave"
+                  : statuses.includes("Present")
                   ? "Present"
                   : statuses.includes("Late")
                     ? "Late"
@@ -248,7 +264,7 @@ const AttendanceCalendar = () => {
                     </div>
                     {dayStatus && (
                       <span
-                        className={`mt-3 inline-flex rounded-full px-1.5 py-1 text-[10px] font-bold ring-1 ring-inset ${statusClasses[dayStatus]}`}
+                        className={`mt-3 inline-flex rounded-full px-1.5 py-1 text-[10px] font-bold ring-1 ring-inset ${dayStatus === "Leave" ? "bg-red-100 text-red-700 ring-red-200" : statusClasses[dayStatus]}`}
                       >
                         {dayStatus}
                       </span>
@@ -284,8 +300,14 @@ const AttendanceCalendar = () => {
                 year: "numeric",
               })}
             </h2>
-            {selectedRecords.length ? (
+            {selectedRecords.length || selectedLeaves.length ? (
               <div className="mt-5 space-y-3">
+                {selectedLeaves.map((leave) => (
+                  <div key={`leave-${leave._id}`} className="rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                    <div className="flex items-center justify-between gap-2"><p className="font-semibold text-red-800">{isEmployee ? "Approved leave" : leave.employeeId?.name || "Employee leave"}</p><span className="rounded-full bg-red-100 px-2 py-1 text-xs font-bold text-red-700">Leave</span></div>
+                    <p className="mt-2 text-sm text-red-700">{leave.reason}</p>
+                  </div>
+                ))}
                 {selectedRecords.map((record) => (
                   <div key={record.id} className="rounded-xl bg-slate-50 p-4">
                     <div className="flex items-center justify-between gap-2">

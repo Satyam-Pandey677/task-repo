@@ -7,6 +7,7 @@ const sharedMenuItems = [
   { label: 'Profile', path: '/profile' },
   { label: 'Attendance', path: '/attendance' },
   { label: 'Calendar', path: '/attendance-calendar' },
+  { label: 'Leave', path: '/leave' },
 ];
 
 const Sidebar = ({ onClose }) => {
