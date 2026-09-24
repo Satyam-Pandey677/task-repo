@@ -178,10 +178,7 @@ The HRMS application is designed to provide an optimized experience across all s
 <div align="center">
 
 <h3>Dashboard</h3>
-
 <img src="./screenshots/desktop-dashboard.png" width="750">
-
-<br><br>
 
 <img src="./screenshots/mobile-dashboard.png" width="280">
 
@@ -191,7 +188,6 @@ The HRMS application is designed to provide an optimized experience across all s
 
 <img src="./screenshots/employees-desktop.png" width="750">
 
-<br><br>
 
 <img src="./screenshots/employees-mobile.png" width="280">
 
@@ -200,8 +196,6 @@ The HRMS application is designed to provide an optimized experience across all s
 <h3>Attendance Management</h3>
 
 <img src="./screenshots/attendance-desktop.png" width="750">
-
-<br><br>
 
 <img src="./screenshots/attendance-mobile.png" width="280">
 
